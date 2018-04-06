@@ -1,5 +1,6 @@
 package com.cdc.mitrais.java.stream;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.IntSummaryStatistics;
 import java.util.List;
@@ -7,11 +8,13 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.cdc.mitrais.entity.Employee;
+import com.cdc.mitrais.entity.Student;
 
 public class App {
 
@@ -110,6 +113,55 @@ public class App {
 		boolean b5 = list.stream().noneMatch(p1);
 		System.out.println(b5);
 
+		/***********************************************************************************
+		 * STREAM API JAVA 8 #peek#
+		 ***********************************************************************************/
+		Stream.iterate(1, (Integer n) -> n+1).peek(n -> System.out.println("Number generated:-"+n))
+		.filter(n -> (n % 2 == 0))
+		.peek(n -> System.out.println("Even number filter passed for - " + n))
+		.limit(5)
+		.count();;
+		
+		List<Integer> numList = Arrays.asList(1,3,4,5,2,7,9);
+		List<Integer> filterList = numList.stream().filter(e -> e >= 5)
+									.peek(e -> System.out.println("Filtered value: "+ e))
+									.filter(e -> e < 9)
+									.peek(c -> System.out.println("Second Filtered Value: "+ c))
+									.collect(Collectors.toList());
+		
+		System.out.println("Filter Result: "+filterList);
+		
+		/***********************************************************************************
+		 * STREAM API JAVA 8 #flatMap#
+		 ***********************************************************************************/
+		String[][] dataStream = new String[][] {{"Berlin","Den Haag"},{"London","Paris"},{"Barcelona","Madrid"}};
+		Stream<String[]> temp = Arrays.stream(dataStream);
+		Stream<String> stringStream = temp.flatMap(x -> Arrays.stream(x));
+		Stream<String> stream = stringStream.filter(x -> "London".equals(x.toString()));
+		stream.forEach(System.out::println);
+		
+		Student student = new Student();
+		student.setName("mkyong");
+		student.addBook("Java 8 in Action");
+		student.addBook("SpringBoot in Action");
+		student.addBook("Effective Java (2nd Edition)");
+		
+		Student student2 = new Student();
+		student2.setName("Zii Hung");
+		student2.addBook("Learning Python, 5th Edition");
+		student2.addBook("SpringBoot in Action");
+		student2.addBook("Restful Services Using Spring");
+		
+		List<Student> studentList = new ArrayList<Student>();
+		studentList.add(student);
+		studentList.add(student2);
+		
+		List<String> bookData = studentList.stream().map(x -> x.getBook())
+													.flatMap(x -> x.stream())
+													.distinct()
+													.collect(Collectors.toList());
+		
+		bookData.forEach(x -> System.out.println("Book Data:"+x));
 	}
 
 }
